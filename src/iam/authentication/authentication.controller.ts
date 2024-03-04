@@ -18,8 +18,6 @@ export class AuthenticationController {
   @HttpCode(HttpStatus.OK)
   @Post('sign-in')
   async signIn(@Body() body: SignInDto) {
-    // const accessToke = await this.authService.signIn(body);
-    // return accessToke;
     return this.authService.signIn(body);
   }
 }
