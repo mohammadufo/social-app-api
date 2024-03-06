@@ -3,6 +3,7 @@ import { Role } from './enums/role.enum';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { BaseEntity } from 'src/shared/database/base.entity';
 import { Follow } from 'src/follows/follow.entity';
+import { Post } from 'src/posts/post.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -40,4 +41,9 @@ export class User extends BaseEntity {
     // cascade: true,
   })
   followings: User[];
+
+  @OneToMany(() => Post, (post) => post.user, {
+    nullable: true,
+  })
+  posts: Post[];
 }
