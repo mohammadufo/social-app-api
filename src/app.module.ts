@@ -6,6 +6,7 @@ import { IamModule } from './iam/iam.module';
 import { ConfigModule } from '@nestjs/config';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
+import { FollowModule } from './follows/follow.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UsersModule } from './users/users.module';
     IamModule,
     PostsModule,
     UsersModule,
+    FollowModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -5,7 +5,6 @@ import {
   Inject,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { HashingService } from '../hashing/hashing.service';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -21,6 +20,7 @@ import {
   InvalidateRefreshTokenError,
 } from './refresh-token-ids.storage';
 import { randomUUID } from 'crypto';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class AuthenticationService {
@@ -37,6 +37,7 @@ export class AuthenticationService {
     try {
       const user = new User();
       user.email = data.email;
+      user.username = data.username;
       user.password = await this.hashingService.hash(data.password);
 
       await this.userRepo.save(user);
@@ -121,7 +122,7 @@ export class AuthenticationService {
     }
   }
 
-  private async signToken<T>(userId: number, expiresIn: number, payload?: T) {
+  private async signToken<T>(userId: string, expiresIn: number, payload?: T) {
     return await this.jwtService.signAsync(
       {
         sub: userId,

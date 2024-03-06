@@ -22,21 +22,21 @@ export class RefreshTokenIdsStorage
     return this.redisClient.quit();
   }
 
-  async insert(userId: number, tokenId: string): Promise<void> {
+  async insert(userId: string, tokenId: string): Promise<void> {
     await this.redisClient.set(this.getKey(userId), tokenId);
   }
 
-  async validate(userId: number, tokenId: string): Promise<Boolean> {
+  async validate(userId: string, tokenId: string): Promise<Boolean> {
     const storedId = await this.redisClient.get(this.getKey(userId));
     if (storedId !== tokenId) {
       throw new InvalidateRefreshTokenError();
     }
     return storedId === tokenId;
   }
-  async invalidate(userId: number): Promise<void> {
+  async invalidate(userId: string): Promise<void> {
     this.redisClient.del(this.getKey(userId));
   }
-  private getKey(userId: number): string {
+  private getKey(userId: string): string {
     return `user-${userId}`;
   }
 }
