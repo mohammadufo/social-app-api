@@ -194,4 +194,12 @@ export class UsersService {
 
     return this.likeRepo.save(like);
   }
+
+  async getProfile(user: ActiveUserData): Promise<User> {
+    const currentUser = await this.userRepo.findOne({
+      where: { id: user.sub },
+    });
+
+    return currentUser;
+  }
 }

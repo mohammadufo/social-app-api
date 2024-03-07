@@ -21,6 +21,7 @@ import { QueryOrder } from 'src/shared/decorators/order-query.decorator';
 import { OrderDto } from 'src/shared/dtos/order.dto';
 import { Paginate } from 'src/shared/classes/paginate';
 import { Like } from 'src/like/like.entity';
+import { User } from './user.entity';
 
 @Controller('users')
 export class UsersController {
@@ -53,19 +54,10 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @Serialize(OutputUserDto)
+  @Get('profile')
+  async getProfile(@ActiveUser() user: ActiveUserData): Promise<User> {
+    return this.usersService.getProfile(user);
   }
 
   @Get('followers/by-user')
