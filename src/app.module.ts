@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 import { FollowModule } from './follows/follow.module';
+import { CommentModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { FollowModule } from './follows/follow.module';
     PostsModule,
     UsersModule,
     FollowModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { Comment } from 'src/comments/comment.entity';
 import { BaseEntity } from 'src/shared/database/base.entity';
 import { User } from 'src/users/user.entity';
 import {
@@ -33,4 +34,9 @@ export class Post extends BaseEntity {
   @IsString()
   @IsNotEmpty()
   userId: string;
+
+  @OneToMany(() => Comment, (comment) => comment.post, {
+    nullable: true,
+  })
+  comments: Comment[];
 }

@@ -58,6 +58,7 @@ export class PostsService {
       where: { id },
       relations: {
         user: true,
+        comments: true,
       },
     });
   }
