@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Comment } from 'src/comments/comment.entity';
+import { Like } from 'src/like/like.entity';
 import { BaseEntity } from 'src/shared/database/base.entity';
 import { User } from 'src/users/user.entity';
 import {
@@ -39,4 +40,9 @@ export class Post extends BaseEntity {
     nullable: true,
   })
   comments: Comment[];
+
+  @OneToMany(() => Like, (like) => like.post, {
+    cascade: ['remove'],
+  })
+  likes: Like[];
 }

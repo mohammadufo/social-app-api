@@ -20,6 +20,7 @@ import { PaginationDto } from 'src/shared/dtos/pagination.dto';
 import { QueryOrder } from 'src/shared/decorators/order-query.decorator';
 import { OrderDto } from 'src/shared/dtos/order.dto';
 import { Paginate } from 'src/shared/classes/paginate';
+import { Like } from 'src/like/like.entity';
 
 @Controller('users')
 export class UsersController {
@@ -95,5 +96,13 @@ export class UsersController {
     );
 
     return new Paginate(items, pagination.getPagination(total));
+  }
+
+  @Post('like/:postId')
+  likePost(
+    @ActiveUser() user: ActiveUserData,
+    @Param('postId') postId: uuid,
+  ): Promise<Like | SuccessStatus> {
+    return this.usersService.likePost(user, postId);
   }
 }

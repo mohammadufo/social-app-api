@@ -12,12 +12,16 @@ import { ActiveUserData } from 'src/iam/interfaces/active-user.interface';
 import { Follow } from 'src/follows/follow.entity';
 import { PaginationDto } from 'src/shared/dtos/pagination.dto';
 import { OrderDto } from 'src/shared/dtos/order.dto';
+import { Like } from 'src/like/like.entity';
+import { Post } from 'src/posts/post.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(Follow) private readonly followRepo: Repository<Follow>,
+    @InjectRepository(Post) private readonly postRepo: Repository<Post>,
+    @InjectRepository(Like) private readonly likeRepo: Repository<Like>,
   ) {}
 
   async subscribe(id: string, user: ActiveUserData): Promise<Follow> {
@@ -150,5 +154,44 @@ export class UsersService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  async likePost(
+    user: ActiveUserData,
+    postId: uuid,
+  ): Promise<Like | SuccessStatus> {
+    const post = await this.postRepo.findOne({
+      where: {
+        id: postId,
+      },
+    });
+
+    if (!post) {
+      throw new NotFoundException('post not found!');
+    }
+
+    const alreadyLiked = await this.likeRepo.findOne({
+      where: {
+        userId: user.sub,
+        postId: post.id,
+      },
+    });
+
+    if (alreadyLiked) {
+      await this.likeRepo.remove(alreadyLiked);
+      return {
+        message: 'Like has been removed!',
+        status: 'successful',
+      };
+    }
+
+    const currentUser = await this.userRepo.findOneBy({ id: user.sub });
+
+    const like = this.likeRepo.create({
+      post,
+      user: currentUser,
+    });
+
+    return this.likeRepo.save(like);
   }
 }
