@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './post.entity';
@@ -8,6 +8,7 @@ import { User } from 'src/users/user.entity';
 import { ActiveUserData } from 'src/iam/interfaces/active-user.interface';
 import { PaginationDto } from 'src/shared/dtos/pagination.dto';
 import { OrderDto } from 'src/shared/dtos/order.dto';
+import { Role } from 'src/users/enums/role.enum';
 
 @Injectable()
 export class PostsService {
@@ -74,7 +75,18 @@ export class PostsService {
     return `This action updates a #${id} post`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: uuid, user: ActiveUserData) {
+    const post = await this.postRepo.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+
+    try {
+      if (post.userId === user.sub || post.user.role === Role.Admin) {
+        return this.postRepo.remove(post);
+      }
+    } catch (err) {
+      throw new UnauthorizedException();
+    }
   }
 }
