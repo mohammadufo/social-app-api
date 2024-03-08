@@ -3,7 +3,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, Repository } from 'typeorm';
+import { FindManyOptions, Like, Repository } from 'typeorm';
 import { User } from 'src/users/user.entity';
 import { ActiveUserData } from 'src/iam/interfaces/active-user.interface';
 import { PaginationDto } from 'src/shared/dtos/pagination.dto';
@@ -31,8 +31,15 @@ export class PostsService {
   async getAll(
     pagination: PaginationDto,
     order: OrderDto,
+    term?: string,
   ): Promise<[Post[], number]> {
     const options: FindManyOptions<Post> = {};
+
+    if (term) {
+      options.where = {
+        title: Like(`%${term}%`),
+      };
+    }
 
     if (order?.order) {
       options.order = { [order.order]: order.orderBy };

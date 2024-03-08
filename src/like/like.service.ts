@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like } from './like.entity';
-import { Repository, FindManyOptions } from 'typeorm';
+import { Repository, FindManyOptions, SelectQueryBuilder } from 'typeorm';
 import { PaginationDto } from 'src/shared/dtos/pagination.dto';
 import { OrderDto } from 'src/shared/dtos/order.dto';
 import { Post } from 'src/posts/post.entity';
+import { ActiveUserData } from 'src/iam/interfaces/active-user.interface';
 
 @Injectable()
 export class LikeService {
@@ -46,5 +47,17 @@ export class LikeService {
     options.relations = ['user'];
 
     return this.likeRepo.findAndCount(options);
+  }
+
+  async isLiked(user: ActiveUserData, postId: uuid): Promise<boolean> {
+    const queryBuilder: SelectQueryBuilder<Like> =
+      this.likeRepo.createQueryBuilder('like');
+
+    const likeStatus = await queryBuilder
+      .where('like.userId = :userId', { userId: user.sub })
+      .andWhere('like.postId = :postId', { postId })
+      .getOne();
+
+    return !!likeStatus;
   }
 }

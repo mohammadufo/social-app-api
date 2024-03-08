@@ -6,6 +6,8 @@ import { QueryPagination } from 'src/shared/decorators/query-pagination.decorato
 import { Paginate } from 'src/shared/classes/paginate';
 import { QueryOrder } from 'src/shared/decorators/order-query.decorator';
 import { LikeService } from './like.service';
+import { ActiveUser } from 'src/iam/decorators/active-user.decorator';
+import { ActiveUserData } from 'src/iam/interfaces/active-user.interface';
 
 @Controller('like')
 export class LikeController {
@@ -24,5 +26,13 @@ export class LikeController {
     );
 
     return new Paginate(items, pagination.getPagination(total));
+  }
+
+  @Get('isliked/:postId')
+  async isLiked(
+    @ActiveUser() user: ActiveUserData,
+    @Param('postId') postId: uuid,
+  ): Promise<boolean> {
+    return this.LikeService.isLiked(user, postId);
   }
 }

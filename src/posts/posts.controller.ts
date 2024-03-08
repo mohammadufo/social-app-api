@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Req,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -39,8 +40,13 @@ export class PostsController {
   async getAll(
     @QueryPagination() pagination: PaginationDto,
     @QueryOrder() order: OrderDto,
+    @Query('term') term: string,
   ): Promise<Paginate<Posts>> {
-    const [items, total] = await this.postsService.getAll(pagination, order);
+    const [items, total] = await this.postsService.getAll(
+      pagination,
+      order,
+      term,
+    );
 
     return new Paginate(items, pagination.getPagination(total));
   }
