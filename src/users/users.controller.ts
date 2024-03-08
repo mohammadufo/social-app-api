@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,6 +23,8 @@ import { OrderDto } from 'src/shared/dtos/order.dto';
 import { Paginate } from 'src/shared/classes/paginate';
 import { Like } from 'src/like/like.entity';
 import { User } from './user.entity';
+import { GetWithPagination } from 'src/shared/decorators/get-with-pagination.decorator';
+import { OutPutUserPaginated } from './dto/output-paginated.dto';
 
 @Controller('users')
 export class UsersController {
@@ -48,10 +51,20 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Get()
-  @Serialize(OutputUserDto)
-  async getAllUsers() {
-    return this.usersService.findAll();
+  @GetWithPagination('')
+  // @Serialize(OutPutUserPaginated)
+  async getAllUsers(
+    @QueryPagination() pagination: PaginationDto,
+    @QueryOrder() order: OrderDto,
+    @Query('term') term: string,
+  ) {
+    const [items, total] = await this.usersService.findAll(
+      pagination,
+      order,
+      term,
+    );
+
+    return new Paginate(items, pagination.getPagination(total));
   }
 
   @Serialize(OutputUserDto)

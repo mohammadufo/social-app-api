@@ -6,7 +6,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, Repository } from 'typeorm';
+import { FindManyOptions, Repository, Like as Likee } from 'typeorm';
 import { User } from './user.entity';
 import { ActiveUserData } from 'src/iam/interfaces/active-user.interface';
 import { Follow } from 'src/follows/follow.entity';
@@ -140,8 +140,30 @@ export class UsersService {
     return 'This action adds a new user';
   }
 
-  findAll() {
-    return this.userRepo.find();
+  findAll(
+    pagination: PaginationDto,
+    order: OrderDto,
+    term?: string,
+  ): Promise<[User[], number]> {
+    const options: FindManyOptions<User> = {};
+
+    if (term) {
+      options.where = {
+        username: Likee(`%${term}%`),
+      };
+    }
+
+    if (order?.order) {
+      options.order = { [order.order]: order.orderBy };
+    } else {
+      options.order = { created_at: 'DESC' };
+    }
+    if (pagination) {
+      options.skip = pagination.skip;
+      options.take = pagination.size;
+    }
+
+    return this.userRepo.findAndCount(options);
   }
 
   findOne(id: number) {

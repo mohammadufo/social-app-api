@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Follow } from './follow.entity';
-import { FindManyOptions, Repository } from 'typeorm';
+import { FindManyOptions, Repository, SelectQueryBuilder } from 'typeorm';
 import { PaginationDto } from 'src/shared/dtos/pagination.dto';
 import { OrderDto } from 'src/shared/dtos/order.dto';
 import { User } from 'src/users/user.entity';
@@ -64,5 +64,19 @@ export class FollowService {
     });
 
     return await this.followRepo.save(result);
+  }
+
+  async isFollowed(user: ActiveUserData, userId: uuid): Promise<boolean> {
+    const queryBuilder: SelectQueryBuilder<Follow> =
+      this.followRepo.createQueryBuilder('follow');
+
+    const followStatus = await queryBuilder
+      .where('follow.leaderId = :userId', { userId })
+      .andWhere('follow.followerId = :followerId', { followerId: user.sub })
+      .getOne();
+
+    console.log(followStatus);
+
+    return !!followStatus;
   }
 }

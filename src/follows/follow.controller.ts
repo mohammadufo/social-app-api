@@ -7,6 +7,8 @@ import { Paginate } from 'src/shared/classes/paginate';
 import { Follow } from './follow.entity';
 import { GetWithPagination } from 'src/shared/decorators/get-with-pagination.decorator';
 import { OrderDto } from 'src/shared/dtos/order.dto';
+import { ActiveUser } from 'src/iam/decorators/active-user.decorator';
+import { ActiveUserData } from 'src/iam/interfaces/active-user.interface';
 
 @Controller('/follow')
 export class FollowController {
@@ -20,5 +22,13 @@ export class FollowController {
     const [items, total] = await this.followService.getAll(pagination, order);
 
     return new Paginate(items, pagination.getPagination(total));
+  }
+
+  @Get('isFollowed/:userId')
+  async isLiked(
+    @ActiveUser() user: ActiveUserData,
+    @Param('userId') userId: uuid,
+  ): Promise<boolean> {
+    return this.followService.isFollowed(user, userId);
   }
 }
