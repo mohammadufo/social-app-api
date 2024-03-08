@@ -83,7 +83,7 @@ export class PostsService {
 
     try {
       if (post.userId === user.sub || post.user.role === Role.Admin) {
-        return this.postRepo.remove(post);
+        return this.postRepo.delete({ id: post.id });
       }
     } catch (err) {
       throw new UnauthorizedException();

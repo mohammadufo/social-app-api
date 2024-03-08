@@ -38,11 +38,12 @@ export class Post extends BaseEntity {
 
   @OneToMany(() => Comment, (comment) => comment.post, {
     nullable: true,
+    cascade: true,
   })
   comments: Comment[];
 
   @OneToMany(() => Like, (like) => like.post, {
-    cascade: ['remove'],
+    cascade: true,
   })
   likes: Like[];
 }
